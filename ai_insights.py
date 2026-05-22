@@ -1,7 +1,7 @@
 """ai_insights.py – Claude-powered analysis of the QM dataset."""
 from __future__ import annotations
 
-import json
+import io
 import streamlit as st
 import pandas as pd
 
@@ -38,7 +38,7 @@ def _df_summary(df: pd.DataFrame) -> str:
 
 @st.cache_data(ttl=120, show_spinner=False)
 def get_executive_summary(df_json: str) -> str:
-    df = pd.read_json(df_json)
+    df = pd.read_json(io.StringIO(df_json))
     summary = _df_summary(df)
     prompt = f"""You are a Quality Management expert at NGK Europe, an automotive parts manufacturer.
 Analyse this list of open quality issues and write a crisp executive summary (5-7 bullet points, max 200 words).
