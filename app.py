@@ -461,13 +461,12 @@ def _row_html(row: pd.Series) -> str:
     tid   = int(row["ID"])
     cat   = row.get("Category", "")
     emoji = D.CAT_EMOJI.get(cat, "")
+    tg    = D.safe_str(row.get("Topic Group", ""), fallback="—")   # ← NEW: Topic Group
     sub   = row.get("Sub-Topic", "")
     sev   = D.safe_str(row.get("Severity", ""), fallback="")
     sta   = row.get("Status", "")
     pic   = D.safe_str(row.get("PIC NED", ""), fallback="—")
     days  = int(row["Days Open"])
-    aging = D.safe_str(row.get("Aging Bucket"))
-    ci    = D.safe_str(row.get("Cust. Impact", "No"))
     tf    = row.get("Taskforce", "No")
 
     dc = D.days_cls(days)
@@ -477,19 +476,17 @@ def _row_html(row: pd.Series) -> str:
     sta_bg   = _STAT_BG.get(sta, "#F1F5F9")
     sta_col  = _STAT_COL.get(sta, "#475569")
     tf_html  = '<span style="color:#DC2626;font-weight:700;font-size:.71rem;">🔴 YES</span>' if tf == "YES" else '<span style="color:#CBD5E1;font-size:.71rem;">—</span>'
-    ci_html  = '<span style="color:#B91C1C;font-weight:600;font-size:.71rem;">Yes</span>' if ci == "Yes" else '<span style="color:#94A3B8;font-size:.71rem;">—</span>'
 
     return (
         f'<tr>'
         f'<td class="td-id">{tid}</td>'
         f'<td><span style="font-size:.78rem;">{emoji} {cat}</span></td>'
-        f'<td style="max-width:220px;"><span style="font-weight:500;font-size:.78rem;">{sub}</span></td>'
+        f'<td style="max-width:180px;"><span style="font-size:.76rem;color:#475569;">{tg}</span></td>'
+        f'<td style="max-width:200px;"><span style="font-weight:500;font-size:.78rem;">{sub}</span></td>'
         f'<td><span style="background:{sev_bg};color:{sev_col};padding:2px 8px;border-radius:5px;font-size:.66rem;font-weight:700;">{sev}</span></td>'
         f'<td><span style="background:{sta_bg};color:{sta_col};padding:2px 8px;border-radius:5px;font-size:.66rem;font-weight:700;">{sta}</span></td>'
         f'<td style="font-size:.76rem;">{pic}</td>'
         f'<td class="td-days {dc}" style="color:{days_col};">{days}d</td>'
-        f'<td style="font-size:.71rem;color:#64748B;">{aging}</td>'
-        f'<td>{ci_html}</td>'
         f'<td>{tf_html}</td>'
         f'</tr>'
     )
@@ -546,9 +543,9 @@ def render_topic_table(df: pd.DataFrame, scope: str = "ov") -> None:
     <div class="topic-table-wrap">
     <table class="qm-table">
       <thead><tr>
-        <th>ID</th><th>CATEGORY</th><th>SUB-TOPIC</th><th>SEVERITY</th>
-        <th>STATUS</th><th>PIC</th><th>DAYS</th><th>AGING</th>
-        <th>CUST.</th><th>TASKFORCE</th>
+        <th>ID</th><th>CATEGORY</th><th>TOPIC</th><th>SUB-TOPIC</th>
+        <th>SEVERITY</th><th>STATUS</th><th>PIC</th>
+        <th>DAYS OPEN</th><th>TASKFORCE</th>
       </tr></thead>
       <tbody>{rows_html}</tbody>
     </table></div>
